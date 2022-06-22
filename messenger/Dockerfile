@@ -1,0 +1,24 @@
+FROM python:3.8.3-slim-buster
+
+RUN apt-get update && apt-get install
+
+RUN apt-get install -y \
+  dos2unix \
+  libpq-dev \
+  libmariadb-dev-compat \
+  libmariadb-dev \
+  gcc \
+  && apt-get clean
+
+RUN python -m pip install --upgrade pip
+
+
+WORKDIR /app
+
+COPY requirements.txt .
+
+RUN pip install -U --no-cache-dir -r requirements.txt
+
+ENV PYTHONPATH=/app
+
+CMD ["python", "main.py"]

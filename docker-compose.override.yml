@@ -1,0 +1,55 @@
+version: "3.6"
+services:
+  messenger:
+    restart: always
+    build:
+      context: ./messenger
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${MESSENGER_PORT}:8080"
+    volumes:
+      - ./messenger:/app
+
+  redis:
+    image: redis:latest
+    container_name: rd01
+    ports:
+      - '6379:6379'
+    restart: always
+    expose:
+      - '6379'
+
+  celery_worker:
+    restart: always
+    build:
+      context: ./messenger
+      dockerfile: ./DockerfileWorker
+    env_file:
+      - .env
+    volumes:
+      - ./messenger:/app
+    links:
+      - redis
+
+  postprocessor:
+    restart: always
+    build:
+      context: ./postprocessor
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "${POSTPROCESSOR_PORT}:8080"
+    volumes:
+      - ./postprocessor:/app
+
+  postgres:
+    image: postgres:14.2
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - "./postgres:/var/lib/postgresql/data"
+    env_file:
+      - .env

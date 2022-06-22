@@ -1,0 +1,27 @@
+version: "3.6"
+services:
+  messenger:
+    restart: always
+    build:
+      context: ./messenger
+      dockerfile: ./Dockerfile.prod
+    env_file:
+      - .env
+    ports:
+      - "${MESSENGER_PORT}:8080"
+
+  celery_worker:
+    restart: always
+    build:
+      context: ./messenger
+      dockerfile: ./DockerfileWorker.prod
+    env_file:
+      - .env
+
+  postptocessor:
+    restart: always
+    build:
+      context: ./postprocessor
+      dockerfile: ./Dockerfile
+    env_file:
+      - .env
